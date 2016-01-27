@@ -19,55 +19,59 @@ import java.util.logging.Logger;
  * @author terriBoose
  */
 public class Main {
+    
+    static String mPackage_name = null;
+    static String mDirectory = null;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        String package_name = args[0];
-        String directory = args[1];
-        System.out.println("package name: " + package_name);
-        System.out.println("directory: " + directory);
+        mPackage_name = args[0];
+        mDirectory = args[1];
+        System.out.println("package name: " + mPackage_name);
+        System.out.println("directory: " + mDirectory);
         
-//        System.out.println("CLASSPATH:");
-//        ClassLoader cl = ClassLoader.getSystemClassLoader();
-//        URL[] urls = ((URLClassLoader)cl).getURLs();
-//        for(URL url : urls){
-//            System.out.println(url.getFile());
-//        }
-//        System.out.println("CLASSPATHFORM2: " + System.getProperty("java.class.path"));
-        
-        File dir = new File(directory);
-        ArrayList<String> files = new ArrayList<String>(Arrays.asList(dir.list()));
+        printHeader();
+        ArrayList<String> files = getFilesFromString(mDirectory);
 
         for(String file : files){
-            if(file.endsWith(".class")){
-                file = file.substring(0, file.length() - 6);
-                System.out.print(file);
-                Class<?> c = null;
-                try { 
-                    c = Class.forName(package_name + "." + file);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+                
+                Class<?> cls = getClassFromFilename(file);
+                if(cls != null){
+                    System.out.println(cls);
                 }
-                System.out.println(" " + c);
-            }
         }
-        
-//        Class<?> c = null;
-//        try { 
-//            c = Class.forName(package_name);
-//        } catch (ClassNotFoundException ex) {
-//            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        
-//        System.out.println(c.toString());
-//        Class<?>[] c2 = c.getClasses();
-//        for(Class<?> cls : c2){
-//            System.out.println(cls);
-//        }
-        
     }
     
+    private static void printHeader(){
+        System.out.println(":- discontiguous bcClass/3, bcMember/7.");
+        System.out.println(":- dynamic bcClass/3, bcMember/7.");
+    }
+    
+    private static ArrayList<String> getFilesFromString(String directory){
+        File dir = new File(directory);
+        ArrayList<String> files = new ArrayList<String>(Arrays.asList(dir.list()));
+        return files;
+    }
+    
+    // Returns null if class is not found
+    private static Class<?> getClassFromFilename(String file) {
+        Class<?> c = null;
+        // Ignore non-.class files
+        if(file.endsWith(".class")){
+            
+            // Chop off the ".class" part of filename
+            file = file.substring(0, file.length() - 6);
+            
+            // Get the file!
+            try {
+                c = Class.forName(mPackage_name + "." + file);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return c;
+    }
 }
