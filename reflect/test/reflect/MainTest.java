@@ -42,12 +42,17 @@ public class MainTest {
      */
     @Test
     public void testMain() {
-        RegTest.Utility.redirectStdOut("out.txt");  // redirects standard out to file "out.txt"
-        System.out.println("main");
-        String[] args = {"yparser", "/Users/terriBoose/repos/cs373s_softwaredesign/p1_reflection/otherclasses/yparser"};
-        Main.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        RegTest.Utility.validate("out.txt", "correctOut.txt", false); // test passes if files are equal
+
+        RegTest.Utility.redirectStdOut("outYparser.txt");  // redirects standard out to file "out.txt"
+        String[] args1 = {"yparser", 
+            "/Users/terriBoose/repos/cs373s_softwaredesign/p1_reflection/otherclasses/yparser"};
+        Main.main(args1);
+        RegTest.Utility.validate("outYparser.txt", "correctOutYparser.txt", false); // test passes if files are equal
+
+        RegTest.Utility.redirectStdOut("outReflect.txt");  // redirects standard out to file "out.txt"
+        String[] args2 = {"reflect", 
+            "/Users/terriBoose/repos/cs373s_softwaredesign/p1_reflection/reflect/build/classes/reflect/"};
+        RegTest.Utility.validate("outReflect.txt", "correctOutReflect.txt", false);
     }
     
 }
