@@ -85,7 +85,7 @@ public class Main {
         int classNum = mClasses++;
         
         // Class name
-        System.out.println("bcClass(c" + classNum + ",'" + cls.getName() + "','" + cls.getSuperclass().getName().replaceAll("java.lang.","") + "').\n");
+        System.out.println("bcClass(c" + classNum + ",'" + cls.getName() + "','" + formatType(cls.getSuperclass().getName()) + "').\n");
         
         // Public Constructors
         System.out.println("/* public Constructors */");
@@ -133,10 +133,10 @@ public class Main {
     
     private static void printParameters(Class<?>[] params){
         if(params.length > 0){
-            System.out.print(params[0].getName().replaceAll("java.lang.",""));
+            System.out.print(formatType(params[0].getName()));
             for(int i=1; i < params.length; ++i){
                 System.out.print(",");
-                System.out.print(params[i].getName().replaceAll("java.lang.",""));
+                System.out.print(formatType(params[i].getName()));
             }
         }
     }
@@ -145,7 +145,7 @@ public class Main {
         
         Modifier mod = new Modifier();
         int mods = field.getModifiers();
-        String type = field.getType().getName().replaceAll("java.lang.","");
+        String type = formatType(field.getType().getName());
         
         System.out.print("bcMember(");
         System.out.print("m" + mFields++ + ",");
@@ -166,12 +166,20 @@ public class Main {
         System.out.print("c" + classNum + ",");
         System.out.print(mod.isStatic(mods) + ",");
         System.out.print("false,");
-        System.out.print(method.getReturnType().getName().replaceAll("java.lang.","") + ",");
+        System.out.print(formatType(method.getReturnType().getName()) + ",");
         System.out.print("<ARRAY>,");
         System.out.print(method.getName() + "(");
         printParameters(method.getParameterTypes());
         System.out.println(")').");
 
         
+    }
+    
+    private static String formatType(String name){
+        String newName = name.replaceAll("java.lang.","").replaceAll(";","");
+        
+        // Remove array notation
+        newName = newName.replaceAll("(\\[)+L","");
+        return newName;
     }
 }
