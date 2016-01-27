@@ -84,7 +84,7 @@ public class Main {
         int classNum = mClasses++;
         
         // Class name
-        System.out.println("bcClass(c" + classNum + ",'" + cls.getName() + "','" + formatType(cls.getSuperclass().getName()) + "').\n");
+        System.out.println("bcClass(c" + classNum + ",'" + cls.getName() + "','" + formatType(cls.getSuperclass().getName(), false) + "').\n");
         
         // Public Constructors
         System.out.println("/* public Constructors */");
@@ -139,10 +139,10 @@ public class Main {
     // of them
     private static void printParameters(Class<?>[] params){
         if(params.length > 0){
-            System.out.print(formatType(params[0].getName()));
+            System.out.print(formatType(params[0].getName(), true));
             for(int i=1; i < params.length; ++i){
                 System.out.print(",");
-                System.out.print(formatType(params[i].getName()));
+                System.out.print(formatType(params[i].getName(), true));
             }
         }
     }
@@ -153,15 +153,19 @@ public class Main {
         
         Modifier mod = new Modifier();
         int mods = field.getModifiers();
-        String type = formatType(field.getType().getName());
+        String type = formatType(field.getType().getName(), false);
         
         System.out.print("bcMember(");
         System.out.print("m" + mFields++ + ",");
         System.out.print("c" + classNum + ",");
         System.out.print(mod.isStatic(mods) + ",");
         System.out.print("true,");
-        System.out.print(type + ",");
-        System.out.print("'',");
+        System.out.print("'" + type + "',");
+        
+        System.out.print("'");
+        printBrackets(field.getType().getName());
+        System.out.print("',");
+        
         System.out.println("'" + field.getName() + "').");
     }
     
@@ -174,18 +178,22 @@ public class Main {
         System.out.print("c" + classNum + ",");
         System.out.print(mod.isStatic(mods) + ",");
         System.out.print("false,");
-        System.out.print("'" + formatType(method.getReturnType().getName()) + "',");
+        System.out.print("'" + formatType(method.getReturnType().getName(), false) + "',");
         
         System.out.print("'");
-        int arrayDepth = countArray(method.getReturnType().getName());
-        for(int i=0; i<arrayDepth; ++i){
-            System.out.print("[]");
-        }
-        
+        printBrackets(method.getReturnType().getName());
         System.out.print("',");
+        
         System.out.print("'" + method.getName() + "(");
         printParameters(method.getParameterTypes());
         System.out.println(")').");
+    }
+    
+    private static void printBrackets(String name){
+        int arrayDepth = countArray(name);
+        for(int i=0; i<arrayDepth; ++i){
+            System.out.print("[]");
+        }
     }
     
     // Counts the depth of an array from a string containing a type name
@@ -201,17 +209,20 @@ public class Main {
     // Given a String containing a type name, removes leading "java.lang." and
     // reformats array indication from the java Class.geName() format .
     // For example, "java.lang.[[LObject" to "Object[][]"
-    private static String formatType(String types){
+    private static String formatType(String types, boolean addBrackets){
         
         String newType = types.replaceAll("java.lang.","").replaceAll(";","");
         int count = countArray(newType);
         newType = newType.replaceAll("(\\[)+([ZBCLDFIJS])","");
-        StringBuilder temp = new StringBuilder(newType);
-        while(count > 0){
-            temp.append("[]");
-            --count;
+        
+        if(addBrackets){
+            StringBuilder temp = new StringBuilder(newType);
+            while(count > 0){
+                temp.append("[]");
+                --count;
+            }
+            newType = temp.toString();
         }
-        newType = temp.toString();
 
         return newType;
     }
