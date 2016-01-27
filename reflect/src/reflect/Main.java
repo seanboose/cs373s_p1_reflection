@@ -6,6 +6,9 @@
 package reflect;
 
 import java.io.File;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -27,7 +30,6 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
         mPackage_name = args[0];
         mDirectory = args[1];
         System.out.println("package name: " + mPackage_name);
@@ -36,18 +38,18 @@ public class Main {
         printHeader();
         ArrayList<String> files = getFilesFromString(mDirectory);
 
+        int count = 0;
         for(String file : files){
-                
-                Class<?> cls = getClassFromFilename(file);
-                if(cls != null){
-                    System.out.println(cls);
-                }
+            Class<?> cls = getClassFromFilename(file);
+            if(cls != null){
+                printClassContents(cls, count++);
+            }
         }
     }
     
     private static void printHeader(){
         System.out.println(":- discontiguous bcClass/3, bcMember/7.");
-        System.out.println(":- dynamic bcClass/3, bcMember/7.");
+        System.out.println(":- dynamic bcClass/3, bcMember/7.\n");
     }
     
     private static ArrayList<String> getFilesFromString(String directory){
@@ -73,5 +75,29 @@ public class Main {
             }
         }
         return c;
+    }
+    
+    private static void printClassContents(Class<?> cls, int clsNum){
+
+        // Keeps track of all members' index
+        int memNum = 0;
+        
+        // Class name
+        System.out.println("bcClass(c" + clsNum + ",'" + cls.getName() + "','" + cls.getSuperclass().getName().replaceAll("java.lang.","") + "').\n");
+        
+        // Public Constructors
+        System.out.println("/* public Constructors */");
+        Constructor[] constructors = cls.getConstructors();
+        
+        // Public Fields
+        System.out.println("/* public Fields */");
+        Field[] fields = cls.getFields();
+        
+        // Public Methods
+        System.out.println("/* public Methods */");
+        Method[] methods = cls.getMethods();
+        
+        //Final text in formatting
+        System.out.println("/*-------------*/");
     }
 }
